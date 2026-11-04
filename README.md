@@ -2,7 +2,7 @@
 
 A clickable mockup of a clearer team rating and injury view for the HIVE Depth Chart, using the San Francisco 49ers as the example.
 
-**Live page:** https://YOUR-USERNAME.github.io/hive-49ers-mockup/
+**Live page:** https://Alex-Casella.github.io/hive-49ers-mockup/
 
 This is a design mockup for review, not the production app. It runs entirely in the browser from one file (`index.html`), with the 49ers data built in.
 

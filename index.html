@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>49ers Depth Chart Mockup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap">
+<style>
+/* Layout: HIVE Depth page shell. Sticky team header, rating card, roster grid, player sheet (right panel on desktop, bottom sheet on phone). */
+:root {
+  --bg: hsl(40 25% 96%);
+  --card: hsl(0 0% 100%);
+  --muted: hsl(40 15% 93%);
+  --border: hsl(40 15% 84%);
+  --fg: hsl(236 18% 11%);
+  --mfg: hsl(236 12% 42%);
+  --gold: hsl(45 93% 42%);
+  --gold-ink: hsl(40 90% 30%);
+  --gold-soft: hsl(45 80% 88%);
+  --bad: hsl(0 68% 44%);
+  --bad-soft: hsl(0 80% 95%);
+  --warn: hsl(32 92% 38%);
+  --warn-soft: hsl(40 95% 90%);
+  --good: hsl(152 60% 30%);
+  --good-soft: hsl(152 50% 92%);
+  --b90: hsl(42 95% 50%); --b90-fg: hsl(236 18% 11%);
+  --b80: hsl(158 64% 32%); --b80-fg: #fff;
+  --b70: hsl(221 70% 50%); --b70-fg: #fff;
+  --overlay: hsl(236 18% 11% / .45);
+  --team: #AA0000;
+  --team-2: #B3995D;
+  --font-display: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: hsl(236 18% 11%); --card: hsl(236 17% 13%); --muted: hsl(236 15% 16%); --border: hsl(236 14% 21%);
+  --fg: hsl(40 10% 88%); --mfg: hsl(40 8% 58%); --gold: hsl(45 93% 47%); --gold-ink: hsl(45 93% 55%); --gold-soft: hsl(45 60% 18%);
+  --bad: hsl(0 100% 71%); --bad-soft: hsl(0 45% 17%); --warn: hsl(38 92% 55%); --warn-soft: hsl(38 50% 16%);
+  --good: hsl(152 55% 52%); --good-soft: hsl(152 35% 15%); --overlay: hsl(236 30% 4% / .65); color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: hsl(236 18% 11%); --card: hsl(236 17% 13%); --muted: hsl(236 15% 16%); --border: hsl(236 14% 21%);
+  --fg: hsl(40 10% 88%); --mfg: hsl(40 8% 58%); --gold: hsl(45 93% 47%); --gold-ink: hsl(45 93% 55%); --gold-soft: hsl(45 60% 18%);
+  --bad: hsl(0 100% 71%); --bad-soft: hsl(0 45% 17%); --warn: hsl(38 92% 55%); --warn-soft: hsl(38 50% 16%);
+  --good: hsl(152 55% 52%); --good-soft: hsl(152 35% 15%); --overlay: hsl(236 30% 4% / .65); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-sans); font-size: 14px; line-height: 1.45; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.wrap { max-width: 72rem; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.eyebrow { font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--mfg); }
+.muted { color: var(--mfg); }
+
+/* Review ribbon (not product UI) */
+.review { border-bottom: 1px dashed var(--gold); background: var(--gold-soft); }
+.review .wrap { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; padding-block: 8px; font-size: 12.5px; }
+.review strong { color: var(--gold-ink); }
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; background: var(--card); }
+.seg button { border: 0; background: none; padding: 4px 10px; font-size: 12px; }
+.seg button[aria-pressed="true"] { background: var(--gold); color: hsl(236 18% 11%); font-weight: 600; }
+.review .spacer { flex: 1; }
+
+/* Notes */
+.notes { border: 1px dashed var(--gold); border-radius: 10px; background: var(--card); padding: 12px 14px; margin-top: 16px; }
+.notes h2 { margin: 0 0 6px; font-size: 13px; }
+.notes ol { margin: 0; padding-left: 1.3em; display: grid; gap: 4px; font-size: 13px; max-width: 70ch; }
+.notes .try { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.notes .try button { border: 1px solid var(--border); background: var(--muted); border-radius: 6px; padding: 4px 9px; font-size: 12px; }
+.pin { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--gold); color: hsl(236 18% 11%); font: 600 10.5px var(--font-mono); vertical-align: middle; flex: none; }
+body.no-notes .pin, body.no-notes .notes { display: none; }
+
+/* Team header */
+.team-head { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+.stripe { height: 4px; background: linear-gradient(90deg, var(--team) 0 70%, var(--team-2) 70%); }
+.team-head .wrap { padding-block: 10px; display: flex; gap: 12px; align-items: flex-start; }
+.back { border: 1px solid var(--border); background: var(--card); border-radius: 6px; width: 32px; height: 32px; display: grid; place-items: center; flex: none; }
+.team-title h1 { margin: 0; font: italic 400 2rem/1 var(--font-display); color: var(--gold-ink); }
+.sources { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 6px; font-size: 11.5px; color: var(--mfg); align-items: center; }
+.sources span b { color: var(--fg); font-weight: 600; }
+
+/* Rating card */
+.rating { margin-top: 18px; border: 1px solid var(--border); background: var(--card); border-radius: 12px; }
+.rating-top { display: grid; grid-template-columns: 1fr 1fr; }
+.unit { padding: 16px; min-width: 0; }
+.unit + .unit { border-left: 1px solid var(--border); }
+.unit-name { display: flex; align-items: center; gap: 8px; }
+.steps { display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+.step { display: grid; gap: 2px; }
+.step .lbl { font-size: 11.5px; color: var(--mfg); }
+.step .big { font: 600 2rem/1 var(--font-mono); font-variant-numeric: tabular-nums; }
+.step .exact { font: 11px var(--font-mono); color: var(--mfg); }
+.step.now .big { color: var(--fg); }
+.step.full .big { color: var(--mfg); }
+.arrow { color: var(--mfg); padding-bottom: 18px; }
+.delta { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 13px; }
+.delta .chg { font: 600 13px var(--font-mono); padding: 1px 7px; border-radius: 5px; background: var(--bad-soft); color: var(--bad); }
+.delta .chg.zero { background: var(--muted); color: var(--mfg); }
+.delta .chg.user { background: var(--gold-soft); color: var(--gold-ink); }
+.why-btn { border: 1px solid var(--border); background: var(--muted); border-radius: 6px; padding: 3px 9px; font-size: 12.5px; }
+.explain { border-top: 1px solid var(--border); padding: 10px 16px; font-size: 12.5px; color: var(--mfg); display: flex; gap: 8px; align-items: flex-start; }
+.explain p { margin: 0; max-width: 80ch; }
+
+/* Breakdown */
+.breakdown { border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; }
+.bd { padding: 14px 16px 16px; min-width: 0; }
+.bd + .bd { border-left: 1px solid var(--border); }
+.bd h3 { margin: 0 0 8px; font-size: 13px; }
+.bd h4 { margin: 14px 0 6px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--mfg); font-weight: 600; display: flex; gap: 8px; align-items: center; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) 84px 52px; gap: 10px; align-items: center; padding: 6px 4px; border-radius: 6px; cursor: pointer; }
+.row:hover { background: var(--muted); }
+.row .who { min-width: 0; }
+.row .who .nm { font-weight: 600; }
+.row .who .sub { font-size: 12px; color: var(--mfg); }
+.row .val { text-align: right; font: 600 13px var(--font-mono); font-variant-numeric: tabular-nums; }
+.val.neg { color: var(--bad); } .val.pos { color: var(--good); }
+.bar { position: relative; height: 8px; background: var(--muted); border-radius: 4px; }
+.bar::after { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--border); }
+.bar i { position: absolute; top: 0; bottom: 0; border-radius: 4px; }
+.bar i.neg { right: 50%; background: var(--bad); }
+.bar i.pos { left: 50%; background: var(--good); }
+.bar i.user { background: var(--gold); }
+.total { display: grid; grid-template-columns: minmax(0,1fr) 52px; gap: 10px; border-top: 1px solid var(--border); margin-top: 6px; padding: 8px 4px 0; font-weight: 600; }
+.total .val { text-align: right; }
+.risk { display: flex; gap: 8px; align-items: center; justify-content: space-between; padding: 6px 4px; font-size: 13px; flex-wrap: wrap; }
+.mini-btn { border: 1px solid var(--border); background: var(--card); border-radius: 6px; padding: 3px 9px; font-size: 12px; }
+.mini-btn.gold { border-color: var(--gold); color: var(--gold-ink); }
+details.none summary { cursor: pointer; font-size: 13px; padding: 6px 4px; color: var(--mfg); }
+details.none ul { margin: 0; padding: 0 4px 4px; list-style: none; display: grid; gap: 2px; }
+details.none li { display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; padding: 4px; border-radius: 5px; cursor: pointer; flex-wrap: wrap; }
+details.none li:hover { background: var(--muted); }
+.empty { font-size: 12.5px; color: var(--mfg); padding: 4px; }
+
+/* Chips & badges */
+.chip { display: inline-flex; align-items: center; gap: 4px; font: 600 10.5px var(--font-mono); letter-spacing: .02em; padding: 1px 6px; border-radius: 4px; border: 1px solid transparent; white-space: nowrap; }
+.chip.out { background: var(--bad-soft); color: var(--bad); }
+.chip.q { background: var(--warn-soft); color: var(--warn); }
+.chip.inactive { background: var(--muted); color: var(--mfg); border-color: var(--border); }
+.chip.user { background: var(--gold-soft); color: var(--gold-ink); }
+.chip.stale { background: transparent; color: var(--warn); border: 1px dashed var(--warn); }
+.badge { display: inline-grid; place-items: center; min-width: 30px; height: 24px; padding: 0 5px; border-radius: 5px; font: 600 12.5px var(--font-mono); background: var(--muted); color: var(--fg); }
+.badge.t90 { background: var(--b90); color: var(--b90-fg); }
+.badge.t80 { background: var(--b80); color: var(--b80-fg); }
+.badge.t70 { background: var(--b70); color: var(--b70-fg); }
+.badge.none { background: transparent; border: 1px dashed var(--border); color: var(--mfg); font-size: 11px; }
+.badge.lg { min-width: 46px; height: 38px; font-size: 18px; border-radius: 7px; }
+
+/* Roster */
+.tabs { display: inline-flex; gap: 2px; margin-top: 22px; border: 1px solid var(--border); background: var(--card); border-radius: 8px; padding: 3px; }
+.tabs button { border: 0; background: none; padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; color: var(--mfg); }
+.tabs button[aria-selected="true"] { background: var(--team); color: #fff; }
+.legend { font-size: 12px; color: var(--mfg); margin: 10px 0 0; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; margin-top: 12px; padding-bottom: 48px; }
+.slot { border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 8px; min-width: 0; }
+.slot-h { display: flex; justify-content: space-between; align-items: baseline; padding: 2px 4px 6px; }
+.slot-h b { font-size: 12px; letter-spacing: .06em; }
+.slot-h span { font-size: 11px; color: var(--mfg); }
+.pl { display: grid; grid-template-columns: auto minmax(0,1fr) auto; gap: 8px; align-items: center; padding: 6px 4px; border-top: 1px solid var(--border); }
+.pl:first-of-type { border-top: 0; }
+.pl .main { min-width: 0; cursor: pointer; border: 0; background: none; text-align: left; padding: 0; }
+.pl .nm { font-weight: 600; font-size: 13px; overflow-wrap: anywhere; }
+.pl .meta { font-size: 11.5px; color: var(--mfg); display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin-top: 2px; }
+.pl.unavail .nm { text-decoration: line-through; text-decoration-color: var(--mfg); color: var(--mfg); }
+.pl.unavail .badge { opacity: .55; }
+.starts { font: 600 10px var(--font-mono); color: var(--good); text-transform: uppercase; letter-spacing: .06em; }
+.sit { border: 1px solid var(--border); background: var(--muted); border-radius: 6px; padding: 4px 8px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.sit.on { background: var(--gold-soft); border-color: var(--gold); color: var(--gold-ink); }
+.sit.locked { background: none; border-style: dashed; color: var(--mfg); cursor: default; }
+
+/* Sheet */
+.overlay { position: fixed; inset: 0; background: var(--overlay); z-index: 40; }
+.sheet { position: fixed; z-index: 50; background: var(--card); border: 1px solid var(--border); overflow-y: auto; overscroll-behavior: contain;
+  top: 0; right: 0; bottom: 0; width: min(440px, 100%); border-radius: 14px 0 0 14px;
+  padding: calc(16px + env(safe-area-inset-top, 0px)) calc(18px + env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) 18px; }
+@media (max-width: 720px) {
+  .sheet { top: auto; left: 0; width: 100%; max-height: 88vh; border-radius: 16px 16px 0 0;
+    padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+  .sheet::before { content: ""; display: block; width: 40px; height: 4px; border-radius: 2px; background: var(--border); margin: 0 auto 10px; }
+}
+.sh-top { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+.sh-top h2 { margin: 4px 0 2px; font: italic 400 1.9rem/1.05 var(--font-display); }
+.teampill { display: inline-block; background: var(--team); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
+.x { border: 1px solid var(--border); background: var(--muted); border-radius: 6px; width: 30px; height: 30px; flex: none; }
+.sec { margin-top: 16px; display: grid; gap: 8px; }
+.sec > h3 { margin: 0; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--mfg); display: flex; gap: 8px; align-items: center; }
+.sitbar { display: flex; gap: 10px; align-items: center; justify-content: space-between; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; background: var(--muted); font-size: 13px; flex-wrap: wrap; }
+.callout { border-radius: 8px; padding: 9px 11px; font-size: 13px; border: 1px solid var(--border); background: var(--muted); }
+.callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+.callout.info { border-color: var(--gold); background: var(--gold-soft); }
+.callout b { display: block; margin-bottom: 2px; }
+.facts { display: grid; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.fact { display: grid; grid-template-columns: 9.5rem minmax(0, 1fr); gap: 10px; padding: 8px 10px; border-top: 1px solid var(--border); font-size: 13px; }
+.fact:first-child { border-top: 0; }
+.fact .k { color: var(--mfg); font-size: 12px; }
+.fact .v { min-width: 0; }
+.fact .src { display: block; font-size: 11px; color: var(--mfg); margin-top: 1px; }
+.fact .missing { color: var(--mfg); font-style: italic; }
+@media (max-width: 420px) { .fact { grid-template-columns: 1fr; gap: 2px; } }
+.weeks { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 3px; }
+.wk { border-radius: 5px; padding: 4px 2px; text-align: center; background: var(--muted); font: 10px/1.25 var(--font-mono); color: var(--mfg); min-width: 0; }
+.wk b { display: block; font-size: 11px; color: var(--fg); }
+.wk.out { background: var(--bad-soft); } .wk.out b { color: var(--bad); }
+.wk.q { background: var(--warn-soft); } .wk.q b { color: var(--warn); }
+.wk.bye { background: none; border: 1px dashed var(--border); }
+.ratings { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.ratings .cap { font-size: 11.5px; color: var(--mfg); max-width: 26ch; }
+.impact { display: flex; justify-content: space-between; align-items: center; gap: 10px; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 13px; flex-wrap: wrap; }
+.impact .val { font: 600 15px var(--font-mono); }
+
+@media (max-width: 720px) {
+  .rating-top, .breakdown { grid-template-columns: 1fr; }
+  .unit + .unit, .bd + .bd { border-left: 0; border-top: 1px solid var(--border); }
+  .team-title h1 { font-size: 1.7rem; }
+  .row { grid-template-columns: minmax(0, 1fr) 56px 46px; }
+}
+@media (prefers-reduced-motion: no-preference) { .sheet { animation: in .18s ease-out; } @keyframes in { from { opacity: 0; transform: translateY(12px); } } }
+</style>
+
+<div class="review">
+  <div class="wrap">
+    <strong>Mockup for review</strong>
+    <span>Depth Chart v1 · 49ers · data snapshot Mon Nov 2</span>
+    <span class="spacer"></span>
+    <span class="muted">Rating basis</span>
+    <span class="seg" role="group" aria-label="Rating basis">
+      <button id="basis-b" aria-pressed="true" data-basis="b">Current calc</button>
+      <button id="basis-m" aria-pressed="false" data-basis="m">Madden only</button>
+    </span>
+    <span class="pin">8</span>
+    <span class="seg" role="group" aria-label="Review notes">
+      <button id="notes-on" aria-pressed="true">Notes on</button>
+      <button id="notes-off" aria-pressed="false">Off</button>
+    </span>
+  </div>
+</div>
+
+<header class="team-head">
+  <div class="stripe"></div>
+  <div class="wrap">
+    <button class="back" aria-label="All teams">←</button>
+    <div class="team-title" style="min-width:0">
+      <div class="eyebrow">San Francisco · NFC West</div>
+      <h1>49ers</h1>
+      <div class="sources">
+        <span class="pin">1</span>
+        <span>Roster <b>nflverse · Oct 30</b></span>
+        <span>Ratings <b>Madden 27 · Week 7</b></span>
+        <span>Injuries <b>Sleeper · checked 12 min ago</b></span>
+        <span>Official report <b>Week 7</b> · bye in Week 8 · Week 9 report starts Wed Nov 4</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="notes" aria-label="Review notes">
+    <h2>What changed in this mockup</h2>
+    <ol>
+      <li>Every dataset shows where it came from and how old it is.</li>
+      <li>Each unit shows <b>Full strength</b> beside <b>This week</b>, plus the exact values. The headline is rounded; the exact numbers explain why −1.7 can show as 84 → 82 or 79 → 78.</li>
+      <li><b>Why?</b> lists only the players who moved the number, each with their own share. The shares add up to the total, so no player is shown next to the whole unit's drop.</li>
+      <li>Injured backups behind a healthy starter go in a <b>No effect</b> group with the reason. C.J. West is here.</li>
+      <li>Your sit-outs are a separate step (Reported → With your sit-outs) with their own undo, so a simulation never reads as news.</li>
+      <li>Roster rows show status, body part and how old the update is. Old Q/Out updates get an amber "may be out of date" tag.</li>
+      <li>The player sheet separates three dates: official report history, the provider's last update, and when HIVE last checked. Missing facts say "not provided".</li>
+      <li>Proposal: switch the rating to Madden only. Today's "PFF" input is generated (Madden × 0.95 + noise), not real PFF. Toggle to compare.</li>
+    </ol>
+    <div class="try">
+      <span class="muted" style="font-size:12px;align-self:center">Try:</span>
+      <button data-open="Nick Bosa">Bosa: old injury, recent update</button>
+      <button data-open="C.J. West">West: missing info, no effect</button>
+      <button data-open="Christian McCaffrey">McCaffrey: newer than official report</button>
+      <button data-open="Marques Sigle">Sigle: stale status</button>
+      <button data-open="Kurtis Rourke">Rourke: not an injury</button>
+      <button id="try-sit">Sit out Fred Warner</button>
+    </div>
+  </section>
+
+  <section class="rating" aria-label="Team rating">
+    <div class="rating-top" id="units"></div>
+    <div class="breakdown" id="breakdown" hidden></div>
+    <div class="explain">
+      <span class="pin">2</span>
+      <p>Team rating is the position-weighted average of each expected starter's rating (QB counts most, then tackles, receivers, edge rushers…). A player only moves it if he starts, or everyone ahead of him is also out. It doesn't account for scheme, snap share or recent form. Questionable players count as playing.</p>
+    </div>
+  </section>
+
+  <div class="tabs" role="tablist" aria-label="Roster view" id="tabs">
+    <button role="tab" data-tab="OFF" aria-selected="false">Offense</button>
+    <button role="tab" data-tab="DEF" aria-selected="true">Defense</button>
+    <button role="tab" data-tab="ST" aria-selected="false">Special teams</button>
+  </div>
+  <p class="legend"><span class="pin">6</span> Tap a player for injury details. <b>Sit out</b> simulates a player missing the game; reported injuries are applied automatically.</p>
+  <div class="grid" id="grid"></div>
+</main>
+
+<div id="sheet-root"></div>
+
+<script>
+const DATA = {"abbr":"SF","offOvr":84,"defOvr":79,"slots":[{"pos":"QB","unit":"OFF","players":[{"id":"SF_QB_00-0037834","n":"Brock Purdy","d":1,"m":92,"b":89,"inj":null,"off":[]},{"id":"SF_QB_00-0036972","n":"Mac Jones","d":2,"m":75,"b":74,"inj":null,"off":[]},{"id":"SF_QB_00-0040589","n":"Kurtis Rourke","d":3,"m":63,"b":61,"inj":{"status":"Out","body":"Coach's Decision","notes":null,"updated":"2026-10-11T19:20Z"},"off":[]}]},{"pos":"LWR","unit":"OFF","players":[{"id":"SF_LWR_00-0031408","n":"Mike Evans","d":1,"m":91,"b":89,"inj":{"status":"Out","body":"Achilles","notes":"Tendinitis","updated":"2026-10-27T05:30Z"},"off":[{"w":3,"s":"Questionable","i":"Hip","p":"Limited Participation in Practice"},{"w":4,"s":"Questionable","i":"Ribs","p":"Limited Participation in Practice"},{"w":5,"s":null,"i":"Ribs","p":"Limited Participation in Practice"},{"w":6,"s":"Questionable","i":"Ribs","p":"Did Not Participate In Practice"},{"w":7,"s":"Out","i":"Ribs","p":"Did Not Participate In Practice"}]},{"id":"SF_LWR_00-0031236","n":"Brandin Cooks","d":2,"m":74,"b":72,"inj":null,"off":[]},{"id":"SF_LWR_00-0032775","n":"Demarcus Robinson","d":3,"m":76,"b":73,"inj":{"status":"IR","body":"Ankle","notes":null,"updated":"2026-10-26T22:30Z"},"off":[{"w":3,"s":"Out","i":"Ankle","p":"Did Not Participate In Practice"}]}]},{"pos":"RWR","unit":"OFF","players":[{"id":"SF_RWR_00-0035719","n":"Deebo Samuel","d":1,"m":79,"b":77,"inj":{"status":"Out","body":"Hamstring","notes":null,"updated":"2026-10-27T05:30Z"},"off":[{"w":6,"s":"Out","i":"Hamstring","p":"Did Not Participate In Practice"},{"w":7,"s":"Out","i":"Hamstring","p":"Did Not Participate In Practice"}]},{"id":"SF_RWR_00-0034775","n":"Christian Kirk","d":2,"m":78,"b":76,"inj":null,"off":[{"w":6,"s":"Questionable","i":"Calf","p":"Limited Participation in Practice"},{"w":7,"s":"Questionable","i":"Calf","p":"Full Participation in Practice"}]},{"id":"SF_RWR_00-0041035","n":"De'Zhaun Stribling","d":3,"m":76,"b":75,"inj":{"status":"IR","body":"Ankle","notes":"Surgery","updated":"2026-11-02T22:45Z"},"off":[{"w":2,"s":"Out","i":"Ankle","p":"Did Not Participate In Practice"}]}]},{"pos":"SWR","unit":"OFF","players":[{"id":"SF_SWR_00-0040172","n":"Jordan Watkins","d":1,"m":70,"b":70,"inj":null,"off":[]},{"id":"SF_SWR_00-0039365","n":"Jacob Cowing","d":2,"m":71,"b":69,"inj":null,"off":[{"w":6,"s":null,"i":"Ankle","p":"Full Participation in Practice"}]},{"id":"SF_SWR_00-0039916","n":"Ricky Pearsall","d":3,"m":80,"b":80,"inj":{"status":"IR","body":"Knee - PCL","notes":null,"updated":"2026-10-04T02:40Z"},"off":[]}]},{"pos":"LT","unit":"OFF","players":[{"id":"SF_LT_00-0027857","n":"Trent Williams","d":1,"m":97,"b":95,"inj":null,"off":[{"w":2,"s":null,"i":"Not injury related - resting player","p":"Full Participation in Practice"},{"w":3,"s":null,"i":"Not injury related - resting player","p":"Full Participation in Practice"},{"w":4,"s":null,"i":"Not injury related - resting player","p":"Full Participation in Practice"},{"w":5,"s":null,"i":"Not injury related - resting player","p":"Full Participation in Practice"},{"w":6,"s":null,"i":"Not injury related - resting player","p":"Full Participation in Practice"},{"w":7,"s":null,"i":"Not injury related - resting player","p":"Full Participation in Practice"}]},{"id":"SF_LT_00-0037287","n":"Vederian Lowe","d":2,"m":66,"b":66,"inj":null,"off":[]},{"id":"SF_LT_00-0041090","n":"Enrique Cruz Jr.","d":3,"m":68,"b":66,"inj":null,"off":[]},{"id":"SF_LT_00-0035829","n":"Austen Pleasants","d":4,"m":65,"b":62,"inj":{"status":"IR","body":"Knee","notes":null,"updated":"2026-09-01T00:05Z"},"off":[]}]},{"pos":"LG","unit":"OFF","players":[{"id":"SF_LG_00-0040245","n":"Connor Colby","d":1,"m":68,"b":66,"inj":null,"off":[]},{"id":"SF_LG_00-0041061","n":"Carver Willis","d":2,"m":67,"b":66,"inj":null,"off":[{"w":6,"s":null,"i":"Toe","p":"Full Participation in Practice"}]},{"id":"SF_LG_00-0037831","n":"Nick Zakelj","d":3,"m":63,"b":61,"inj":{"status":"IR","body":"Undisclosed","notes":null,"updated":"2026-09-01T00:15Z"},"off":[]}]},{"pos":"C","unit":"OFF","players":[{"id":"SF_C_00-0032701","n":"Jake Brendel","d":1,"m":78,"b":77,"inj":null,"off":[]},{"id":"SF_C_00-0038615","n":"Jarrett Patterson","d":2,"m":70,"b":68,"inj":null,"off":[]}]},{"pos":"RG","unit":"OFF","players":[{"id":"SF_RG_00-0039351","n":"Dominick Puni","d":1,"m":82,"b":81,"inj":null,"off":[]},{"id":"SF_RG_00-0041061","n":"Carver Willis","d":2,"m":67,"b":64,"inj":null,"off":[{"w":6,"s":null,"i":"Toe","p":"Full Participation in Practice"}]}]},{"pos":"RT","unit":"OFF","players":[{"id":"SF_RT_00-0036256","n":"Colton McKivitz","d":1,"m":84,"b":83,"inj":null,"off":[{"w":6,"s":null,"i":"Illness","p":"Full Participation in Practice"}]},{"id":"SF_RT_00-0041090","n":"Enrique Cruz Jr.","d":2,"m":68,"b":66,"inj":null,"off":[]}]},{"pos":"TE","unit":"OFF","players":[{"id":"SF_TE_00-0033288","n":"George Kittle","d":1,"m":97,"b":96,"inj":null,"off":[{"w":1,"s":null,"i":"Achilles","p":"Limited Participation in Practice"},{"w":2,"s":null,"i":"Achilles","p":"Full Participation in Practice"}]},{"id":"SF_TE_00-0036887","n":"Luke Farrell","d":2,"m":64,"b":63,"inj":null,"off":[]},{"id":"SF_TE_00-0038643","n":"Brayden Willis","d":3,"m":63,"b":60,"inj":null,"off":[]},{"id":"SF_TE_00-0037112","n":"Jake Tonges","d":4,"m":72,"b":71,"inj":{"status":"IR","body":"Knee","notes":null,"updated":"2026-09-16T20:15Z"},"off":[]}]},{"pos":"HB","unit":"OFF","players":[{"id":"SF_HB_00-0033280","n":"Christian McCaffrey","d":1,"m":97,"b":93,"inj":{"status":"Questionable","body":"Calf","notes":null,"updated":"2026-10-27T05:30Z"},"off":[{"w":2,"s":null,"i":"Not injury related - resting player","p":"Full Participation in Practice"},{"w":3,"s":null,"i":"Not injury related - resting player","p":"Full Participation in Practice"},{"w":4,"s":null,"i":"Not injury related - resting player","p":"Full Participation in Practice"},{"w":5,"s":null,"i":"Not injury related - resting player","p":"Full Participation in Practice"},{"w":6,"s":null,"i":"Not injury related - resting player","p":"Full Participation in Practice"}]},{"id":"SF_HB_00-0041052","n":"Kaelon Black","d":2,"m":74,"b":74,"inj":null,"off":[{"w":2,"s":"Questionable","i":"Groin","p":"Limited Participation in Practice"},{"w":5,"s":null,"i":"Illness","p":"Full Participation in Practice"},{"w":6,"s":null,"i":"Not injury related - personal matter","p":"Did Not Participate In Practice"}]},{"id":"SF_HB_00-0040177","n":"Jordan James","d":3,"m":73,"b":73,"inj":null,"off":[]},{"id":"SF_HB_00-0039363","n":"Isaac Guerendo","d":4,"m":72,"b":71,"inj":{"status":"PUP","body":"Pectoral","notes":"Surgery","updated":"2026-08-30T23:50Z"},"off":[]}]},{"pos":"LE","unit":"DEF","players":[{"id":"SF_LE_00-0039148","n":"Keion White","d":1,"m":73,"b":73,"inj":null,"off":[{"w":2,"s":null,"i":"Back","p":"Full Participation in Practice"},{"w":4,"s":"Questionable","i":"Hamstring","p":"Limited Participation in Practice"}]},{"id":"SF_LE_00-0041556","n":"Romello Height","d":2,"m":76,"b":76,"inj":null,"off":[{"w":1,"s":null,"i":"Ankle","p":"Full Participation in Practice"},{"w":3,"s":"Out","i":"Hand","p":"Did Not Participate In Practice"},{"w":4,"s":null,"i":"Hand","p":"Limited Participation in Practice"},{"w":5,"s":null,"i":"Hand","p":"Full Participation in Practice"},{"w":6,"s":null,"i":"Hand","p":"Limited Participation in Practice"},{"w":7,"s":null,"i":"Hand","p":"Full Participation in Practice"}]},{"id":"SF_LE_00-0036341","n":"Khalid Kareem","d":3,"m":67,"b":64,"inj":null,"off":[{"w":2,"s":null,"i":"Shoulder","p":"Full Participation in Practice"}]},{"id":"SF_LE_00-0037602","n":"Sam Okuayinonu","d":4,"m":68,"b":66,"inj":{"status":"IR","body":"Foot","notes":null,"updated":"2026-09-08T07:30Z"},"off":[]}]},{"pos":"RE","unit":"DEF","players":[{"id":"SF_RE_00-0035717","n":"Nick Bosa","d":1,"m":93,"b":92,"inj":{"status":"Out","body":"Knee","notes":"Strain","updated":"2026-10-27T05:40Z"},"off":[{"w":1,"s":null,"i":"Knee","p":"Limited Participation in Practice"},{"w":2,"s":null,"i":"Not injury related - resting player","p":"Full Participation in Practice"},{"w":3,"s":"Out","i":"Knee","p":"Did Not Participate In Practice"},{"w":4,"s":"Out","i":"Knee","p":"Did Not Participate In Practice"},{"w":5,"s":"Out","i":"Knee","p":"Did Not Participate In Practice"},{"w":6,"s":"Out","i":"Knee","p":"Did Not Participate In Practice"},{"w":7,"s":"Out","i":"Knee","p":"Did Not Participate In Practice"}]},{"id":"SF_RE_00-0040660","n":"Mykel Williams","d":2,"m":77,"b":75,"inj":null,"off":[{"w":4,"s":"Out","i":"Knee","p":"Limited Participation in Practice"},{"w":5,"s":"Questionable","i":"Knee","p":"Full Participation in Practice"},{"w":6,"s":"Questionable","i":"Knee","p":"Limited Participation in Practice"},{"w":7,"s":null,"i":"Knee","p":"Full Participation in Practice"}]},{"id":"SF_RE_00-0038865","n":"Andrew Farmer II","d":3,"m":null,"b":null,"inj":{"status":"IR","body":"Back","notes":null,"updated":"2026-07-31T06:05Z"},"off":[]}]},{"pos":"DT","unit":"DEF","players":[{"id":"SF_DT_00-0036942","n":"Osa Odighizuwa","d":1,"m":77,"b":76,"inj":null,"off":[]},{"id":"SF_DT_00-0040560","n":"Sebastian Valdez","d":2,"m":66,"b":65,"inj":null,"off":[]},{"id":"SF_DT_00-0040711","n":"C.J. West","d":3,"m":69,"b":68,"inj":{"status":"IR","body":"Undisclosed","notes":null,"updated":"2026-09-23T23:20Z"},"off":[]}]},{"pos":"LOLB","unit":"DEF","players":[{"id":"SF_LOLB_00-0034982","n":"Dre Greenlaw","d":1,"m":85,"b":85,"inj":null,"off":[{"w":1,"s":null,"i":"Achilles","p":"Full Participation in Practice"},{"w":2,"s":null,"i":"Not injury related - resting player","p":"Full Participation in Practice"},{"w":3,"s":null,"i":"Not injury related - resting player","p":"Full Participation in Practice"},{"w":4,"s":"Questionable","i":"Quadricep","p":"Limited Participation in Practice"},{"w":5,"s":null,"i":"Not injury related - resting player","p":"Full Participation in Practice"}]},{"id":"SF_LOLB_00-0036844","n":"Garret Wallow","d":2,"m":63,"b":63,"inj":{"status":"Out","body":"Hamstring","notes":"Strain","updated":"2026-10-24T02:30Z"},"off":[{"w":6,"s":"Out","i":"Hamstring","p":"Did Not Participate In Practice"},{"w":7,"s":"Out","i":"Hamstring","p":"Did Not Participate In Practice"}]}]},{"pos":"ROLB","unit":"DEF","players":[{"id":"SF_ROLB_00-0041078","n":"Jaden Dugger","d":1,"m":69,"b":67,"inj":null,"off":[{"w":4,"s":"Questionable","i":"Shoulder","p":"Limited Participation in Practice"},{"w":5,"s":null,"i":"Shoulder","p":"Full Participation in Practice"},{"w":7,"s":null,"i":"Knee","p":"Full Participation in Practice"}]},{"id":"SF_ROLB_00-0035413","n":"Luke Gifford","d":2,"m":66,"b":66,"inj":{"status":"Out","body":"Groin","notes":null,"updated":"2026-10-24T02:25Z"},"off":[{"w":1,"s":null,"i":"Hamstring","p":"Full Participation in Practice"},{"w":7,"s":"Out","i":"Groin","p":"Did Not Participate In Practice"}]}]},{"pos":"MLB","unit":"DEF","players":[{"id":"SF_MLB_00-0034815","n":"Fred Warner","d":1,"m":98,"b":95,"inj":null,"off":[]},{"id":"SF_MLB_00-0039435","n":"Tatum Bethune","d":2,"m":70,"b":70,"inj":null,"off":[]},{"id":"SF_MLB_00-0040135","n":"Nick Martin","d":3,"m":71,"b":70,"inj":{"status":"IR","body":null,"notes":null,"updated":"2026-08-31T22:55Z"},"off":[]}]},{"pos":"CB","unit":"DEF","players":[{"id":"SF_CB_00-0039345","n":"Renardo Green","d":1,"m":78,"b":76,"inj":null,"off":[{"w":1,"s":null,"i":"Hamstring","p":"Full Participation in Practice"}]}]},{"pos":"RCB","unit":"DEF","players":[{"id":"SF_RCB_00-0036563","n":"Deommodore Lenoir","d":1,"m":83,"b":79,"inj":null,"off":[]},{"id":"SF_RCB_00-0041068","n":"Ephesians Prysock","d":2,"m":70,"b":71,"inj":null,"off":[]},{"id":"SF_RCB_00-0036871","n":"Nate Hobbs","d":3,"m":76,"b":76,"inj":{"status":"IR","body":"Groin","notes":null,"updated":"2026-10-07T07:20Z"},"off":[]}]},{"pos":"FS","unit":"DEF","players":[{"id":"SF_FS_00-0038554","n":"Ji'Ayir Brown","d":1,"m":74,"b":72,"inj":null,"off":[]},{"id":"SF_FS_00-0036329","n":"Ashtyn Davis","d":2,"m":73,"b":73,"inj":null,"off":[{"w":7,"s":null,"i":"Hamstring","p":"Full Participation in Practice"}]},{"id":"SF_FS_00-0036638","n":"Darrick Forrest","d":3,"m":71,"b":69,"inj":{"status":"IR","body":"Undisclosed","notes":null,"updated":"2026-05-29T00:50Z"},"off":[]}]},{"pos":"SS","unit":"DEF","players":[{"id":"SF_SS_00-0040185","n":"Marques Sigle","d":1,"m":76,"b":76,"inj":{"status":"Out","body":"Ankle","notes":null,"updated":"2026-10-24T01:15Z"},"off":[{"w":5,"s":"Out","i":"Ankle","p":"Did Not Participate In Practice"},{"w":6,"s":"Out","i":"Ankle","p":"Did Not Participate In Practice"},{"w":7,"s":"Out","i":"Ankle","p":"Did Not Participate In Practice"}]},{"id":"SF_SS_00-0039360","n":"Malik Mustapha","d":2,"m":77,"b":77,"inj":null,"off":[]},{"id":"SF_SS_00-0034391","n":"Siran Neal","d":3,"m":66,"b":66,"inj":null,"off":[{"w":6,"s":"Questionable","i":"Neck","p":"Limited Participation in Practice"},{"w":7,"s":"Questionable","i":"Knee","p":"Limited Participation in Practice"}]}]},{"pos":"K","unit":"ST","players":[{"id":"SF_K_00-0034173","n":"Eddy Pineiro","d":1,"m":77,"b":75,"inj":null,"off":[{"w":2,"s":"Questionable","i":"Illness","p":"Did Not Participate In Practice"}]}]},{"pos":"P","unit":"ST","players":[{"id":"SF_P_00-0035821","n":"Corliss Waitman","d":1,"m":77,"b":73,"inj":null,"off":[]}]},{"pos":"KR","unit":"ST","players":[{"id":"SF_KR_00-0035719","n":"Deebo Samuel","d":1,"m":79,"b":78,"inj":{"status":"Out","body":"Hamstring","notes":null,"updated":"2026-10-27T05:30Z"},"off":[{"w":6,"s":"Out","i":"Hamstring","p":"Did Not Participate In Practice"},{"w":7,"s":"Out","i":"Hamstring","p":"Did Not Participate In Practice"}]},{"id":"SF_KR_00-0040177","n":"Jordan James","d":2,"m":73,"b":71,"inj":null,"off":[]},{"id":"SF_KR_00-0039365","n":"Jacob Cowing","d":3,"m":71,"b":68,"inj":null,"off":[{"w":6,"s":null,"i":"Ankle","p":"Full Participation in Practice"}]},{"id":"SF_KR_00-0039363","n":"Isaac Guerendo","d":4,"m":72,"b":70,"inj":{"status":"PUP","body":"Pectoral","notes":"Surgery","updated":"2026-08-30T23:50Z"},"off":[]}]},{"pos":"PR","unit":"ST","players":[{"id":"SF_PR_00-0039365","n":"Jacob Cowing","d":1,"m":71,"b":71,"inj":null,"off":[{"w":6,"s":null,"i":"Ankle","p":"Full Participation in Practice"}]},{"id":"SF_PR_00-0040172","n":"Jordan Watkins","d":2,"m":70,"b":68,"inj":null,"off":[]},{"id":"SF_PR_00-0034775","n":"Christian Kirk","d":3,"m":78,"b":78,"inj":null,"off":[{"w":6,"s":"Questionable","i":"Calf","p":"Limited Participation in Practice"},{"w":7,"s":"Questionable","i":"Calf","p":"Full Participation in Practice"}]},{"id":"SF_PR_00-0039916","n":"Ricky Pearsall","d":4,"m":80,"b":78,"inj":{"status":"IR","body":"Knee - PCL","notes":null,"updated":"2026-10-04T02:40Z"},"off":[]}]}]};
+const NOW = Date.parse("2026-11-02T23:58:00Z");
+const LATEST_WEEK = 7;
+const W = {QB:1.00,LWR:0.72,RWR:0.72,SWR:0.60,LT:0.75,LG:0.55,C:0.60,RG:0.55,RT:0.65,TE:0.65,HB:0.70,LE:0.70,RE:0.70,DT:0.65,LOLB:0.65,ROLB:0.65,MLB:0.70,CB:0.68,RCB:0.68,FS:0.60,SS:0.60};
+const POS_NAME = {QB:"Quarterback",LWR:"Wide receiver (left)",RWR:"Wide receiver (right)",SWR:"Slot receiver",LT:"Left tackle",LG:"Left guard",C:"Center",RG:"Right guard",RT:"Right tackle",TE:"Tight end",HB:"Running back",LE:"Left end",RE:"Right end",DT:"Defensive tackle",LOLB:"Outside linebacker (left)",ROLB:"Outside linebacker (right)",MLB:"Middle linebacker",CB:"Cornerback",RCB:"Cornerback (right)",FS:"Free safety",SS:"Strong safety",K:"Kicker",P:"Punter",KR:"Kick returner",PR:"Punt returner"};
+const REPLACEMENT = 60;
+
+const state = { basis: "b", userOut: new Set(), tab: "DEF", open: null, why: true };
+
+// ── Status ──────────────────────────────────────────────────────────────────
+function report(p) {
+  const i = p.inj; if (!i) return null;
+  if (i.body === "Coach's Decision") return { code: "INACTIVE", label: "Inactive", unavail: true, injury: false };
+  const s = i.status.toLowerCase();
+  if (s === "out") return { code: "OUT", label: "Out", unavail: true, injury: true };
+  if (s === "ir") return { code: "IR", label: "IR", unavail: true, injury: true };
+  if (s === "pup") return { code: "PUP", label: "PUP", unavail: true, injury: true };
+  if (s === "questionable") return { code: "Q", label: "Questionable", unavail: false, injury: true };
+  if (s === "doubtful") return { code: "D", label: "Doubtful", unavail: false, injury: true };
+  return null;
+}
+const outR = p => !!report(p)?.unavail;
+const outF = p => outR(p) || state.userOut.has(p.id);
+const val = p => p[state.basis] ?? REPLACEMENT;
+const ageDays = iso => Math.floor((NOW - Date.parse(iso)) / 864e5);
+const fmtDate = iso => new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "America/Los_Angeles" });
+const fmtDateTime = iso => new Date(iso).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/Los_Angeles" });
+const agoText = d => d <= 0 ? "today" : d === 1 ? "yesterday" : d < 14 ? `${d} days ago` : `${Math.round(d / 7)} weeks ago`;
+const fmt1 = x => (x < 0 ? "−" : x > 0 ? "+" : "") + Math.abs(x).toFixed(1);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const last = n => n.split(" ").filter(x => !/^(jr|sr|ii|iii|iv)\.?$/i.test(x)).pop();
+
+function stale(p) {
+  const r = report(p); if (!r || !p.inj.updated) return false;
+  return ["OUT", "Q", "D"].includes(r.code) && ageDays(p.inj.updated) >= 7;
+}
+const PRACTICE = s => !s ? null : /Did Not/i.test(s) ? "DNP" : /Limited/i.test(s) ? "Limited" : /Full/i.test(s) ? "Full" : s;
+function officialRun(p) {
+  const by = Object.fromEntries(p.off.map(r => [r.w, r]));
+  const on = w => by[w] && (by[w].s || (by[w].p && !/Full/i.test(by[w].p)));
+  if (!on(LATEST_WEEK)) return null;
+  let since = LATEST_WEEK; while (since > 1 && on(since - 1)) since--;
+  const outWeeks = []; for (let w = since; w <= LATEST_WEEK; w++) if (by[w].s === "Out") outWeeks.push(w);
+  return { since, outWeeks, latest: by[LATEST_WEEK] };
+}
+function chipFor(p, { short = false } = {}) {
+  if (state.userOut.has(p.id) && !outR(p)) return `<span class="chip user">Your sit-out</span>`;
+  const r = report(p); if (!r) return "";
+  const cls = r.code === "Q" || r.code === "D" ? "q" : r.code === "INACTIVE" ? "inactive" : "out";
+  const body = r.injury && p.inj.body ? ` · ${esc(short ? p.inj.body.split(" - ")[0] : p.inj.body)}` : "";
+  return `<span class="chip ${cls}">${short && r.code === "Q" ? "Q" : r.label}${body}</span>`;
+}
+
+// ── Rating engine (exact, additive) ─────────────────────────────────────────
+function unitCalc(unit) {
+  const slots = DATA.slots.filter(s => s.unit === unit && s.players.length && s.players[0][state.basis] != null);
+  const den = slots.reduce((a, s) => a + W[s.position ?? s.pos], 0);
+  let healthy = 0; const reported = [], user = [], atRisk = [], none = new Map();
+  let sumR = 0, sumU = 0;
+  for (const s of slots) {
+    const w = W[s.pos], ch = s.players;
+    healthy += w * val(ch[0]) / den;
+    const iR = ch.findIndex(p => !outR(p)), endR = iR < 0 ? ch.length : iR;
+    const vR = iR < 0 ? REPLACEMENT : val(ch[iR]);
+    for (let j = 0; j < endR; j++) {
+      const next = j + 1 < endR ? val(ch[j + 1]) : vR;
+      const c = w * (next - val(ch[j])) / den; sumR += c;
+      const to = j + 1 < ch.length ? ch[j + 1] : null;
+      reported.push({ p: ch[j], slot: s, c, from: val(ch[j]), to, toVal: next });
+    }
+    const iF = ch.findIndex(p => !outF(p)), vF = iF < 0 ? REPLACEMENT : val(ch[iF]);
+    if (iR >= 0) {
+      const endF = iF < 0 ? ch.length : iF;
+      const U = ch.slice(iR, endF).filter(p => state.userOut.has(p.id) && !outR(p));
+      U.forEach((p, k) => {
+        const next = k + 1 < U.length ? val(U[k + 1]) : vF;
+        const c = w * (next - val(p)) / den; sumU += c;
+        user.push({ p, slot: s, c, from: val(p), to: iF < 0 ? null : ch[iF], toVal: next });
+      });
+    }
+    if (iF >= 0) {
+      const st = ch[iF], r = report(st);
+      if (r && !r.unavail) {
+        const n = ch.slice(iF + 1).find(p => !outF(p));
+        atRisk.push({ p: st, slot: s, r, c: w * ((n ? val(n) : REPLACEMENT) - val(st)) / den, next: n });
+      }
+    }
+    // Unavailable players who don't move the number
+    ch.forEach((p, idx) => {
+      if (!outF(p)) return;
+      const counted = reported.some(x => x.p.id === p.id) || user.some(x => x.p.id === p.id);
+      if (counted || none.has(p.id)) return;
+      const r = report(p);
+      const ahead = ch.slice(0, idx).find(x => !outF(x));
+      const why = r && !r.injury ? "Not an injury (coach's decision)" : ahead ? `Backup · ${last(ahead.n)} starts` : "Behind other absences";
+      none.set(p.id, { p, slot: s, why });
+    });
+  }
+  // Players in slots that only exist in unrated positions are ignored here.
+  return { healthy, R: healthy + sumR, F: healthy + sumR + sumU, sumR, sumU, reported: reported.filter(x => Math.abs(x.c) >= 0.005), user, atRisk, none: [...none.values()] };
+}
+
+// ── Render: rating card ─────────────────────────────────────────────────────
+function badge(v, lg) {
+  if (v == null) return `<span class="badge none${lg ? " lg" : ""}" title="Not in EA's ratings list">—</span>`;
+  const t = v >= 90 ? "t90" : v >= 80 ? "t80" : v >= 70 ? "t70" : "";
+  return `<span class="badge ${t}${lg ? " lg" : ""}">${v}</span>`;
+}
+function stepHtml(label, x, cls) {
+  return `<div class="step ${cls}"><span class="lbl">${label}</span><span class="big">${Math.round(x)}</span><span class="exact">${x.toFixed(1)}</span></div>`;
+}
+function renderUnits() {
+  const units = [["OFF", "Offense"], ["DEF", "Defense"]].map(([u, name]) => ({ u, name, k: unitCalc(u) }));
+  const anyUser = units.some(x => x.k.user.length);
+  document.getElementById("units").innerHTML = units.map(({ u, name, k }) => {
+    const injured = DATA.slots.filter(s => s.unit === u).flatMap(s => s.players).filter((p, i, a) => outR(p) && a.findIndex(q => q.id === p.id) === i);
+    const movers = new Set(k.reported.map(x => x.p.id)).size;
+    return `<div class="unit">
+      <div class="unit-name"><span class="eyebrow">${name}</span>${u === "OFF" ? '<span class="pin">2</span>' : ""}</div>
+      <div class="steps">
+        ${stepHtml("Full strength", k.healthy, "full")}
+        <span class="arrow">→</span>
+        ${stepHtml(anyUser ? "Reported injuries" : "This week", k.R, anyUser ? "" : "now")}
+        ${anyUser ? `<span class="arrow">→</span>${stepHtml("With your sit-outs", k.F, "now")}` : ""}
+      </div>
+      <div class="delta">
+        <span class="chg ${Math.abs(k.sumR) < .05 ? "zero" : ""}">${fmt1(k.sumR)}</span>
+        <span>from injuries · ${movers} of ${injured.length} out move the rating</span>
+        ${k.user.length ? `<span class="chg user">${fmt1(k.sumU)}</span><span>your sit-outs</span>` : ""}
+      </div>
+    </div>`;
+  }).join("");
+  const bd = document.getElementById("breakdown");
+  bd.hidden = !state.why;
+  const maxAbs = Math.max(0.5, ...units.flatMap(x => [...x.k.reported, ...x.k.user].map(r => Math.abs(r.c))));
+  bd.innerHTML = units.map(({ u, name, k }) => {
+    const rowHtml = (r, isUser) => {
+      const pct = Math.abs(r.c) / maxAbs * 50, sign = r.c < 0 ? "neg" : "pos";
+      const sub = `${r.slot.pos} · ${r.from} → ${r.to ? esc(last(r.to.n)) + " " + r.toVal : "replacement " + r.toVal}${r.c > 0 ? " · backup rated higher" : ""}`;
+      return `<div class="row" data-pid="${r.p.id}" data-pos="${r.slot.pos}" tabindex="0">
+        <div class="who"><div class="nm">${esc(r.p.n)} ${chipFor(r.p, { short: true })}</div><div class="sub num">${sub}</div></div>
+        <div class="bar" aria-hidden="true"><i class="${sign}${isUser ? " user" : ""}" style="width:${pct}%"></i></div>
+        <div class="val ${sign}">${fmt1(r.c)}</div></div>`;
+    };
+    const reported = [...k.reported].sort((a, b) => a.c - b.c);
+    return `<div class="bd">
+      <h3>Why ${name.toLowerCase()} changed ${u === "OFF" ? '<span class="pin">3</span>' : ""}</h3>
+      ${reported.length ? reported.map(r => rowHtml(r, false)).join("") : `<p class="empty">No reported injury changes this unit's starters.</p>`}
+      <div class="total"><span>Reported injuries</span><span class="val num ${k.sumR < 0 ? "neg" : ""}">${fmt1(k.sumR)}</span></div>
+      <h4>Your sit-outs ${u === "OFF" ? '<span class="pin">5</span>' : ""}</h4>
+      ${k.user.length ? k.user.map(r => rowHtml(r, true)).join("") + `<div class="risk"><span class="muted">Total ${fmt1(k.sumU)}</span><button class="mini-btn" data-undo-unit="${u}">Undo all in ${name.toLowerCase()}</button></div>` : `<p class="empty">None. Use Sit out on any player to test a scenario.</p>`}
+      ${k.atRisk.length ? `<h4>Questionable · counted as playing</h4>` + k.atRisk.map(a => `<div class="risk"><span><b>${esc(a.p.n)}</b> ${chipFor(a.p, { short: true })} <span class="muted num">if he sits ${fmt1(a.c)}</span></span><button class="mini-btn gold" data-sit="${a.p.id}">Sit out</button></div>`).join("") : ""}
+      <details class="none"><summary>${k.none.length} other unavailable player${k.none.length === 1 ? "" : "s"}: no effect on the rating ${u === "DEF" ? '<span class="pin">4</span>' : ""}</summary>
+        <ul>${k.none.map(x => `<li data-pid="${x.p.id}" data-pos="${x.slot.pos}"><span><b>${esc(x.p.n)}</b> <span class="muted">${x.slot.pos}${x.slot.players.findIndex(q => q.id === x.p.id) + 1}</span> ${chipFor(x.p, { short: true })}</span><span class="muted">${x.why}</span></li>`).join("")}</ul>
+      </details>
+    </div>`;
+  }).join("");
+}
+
+// ── Render: roster ──────────────────────────────────────────────────────────
+function renderGrid() {
+  const slots = DATA.slots.filter(s => s.unit === state.tab);
+  document.getElementById("grid").innerHTML = slots.map(s => {
+    const order = [...s.players.filter(p => !outF(p)), ...s.players.filter(outF)];
+    const w = W[s.pos];
+    return `<div class="slot"><div class="slot-h"><b>${s.pos}</b><span>${POS_NAME[s.pos] ?? ""}${w ? ` · weight ${w.toFixed(2)}` : ""}</span></div>
+      ${order.map((p, i) => {
+        const r = report(p), locked = outR(p), on = state.userOut.has(p.id) && !locked;
+        const meta = [chipFor(p, { short: true })];
+        if (p.inj?.updated && r) meta.push(`<span class="num">upd ${fmtDate(p.inj.updated)}</span>`);
+        if (stale(p)) meta.push(`<span class="chip stale">may be out of date</span>`);
+        if (i === 0 && !outF(p) && s.unit !== "ST") meta.unshift(`<span class="starts">Starts</span>`);
+        else if (!r && !on) meta.push(`<span>Depth ${p.d}</span>`);
+        return `<div class="pl ${outF(p) ? "unavail" : ""}">
+          ${badge(p[state.basis])}
+          <button class="main" data-pid="${p.id}" data-pos="${s.pos}"><div class="nm">${esc(p.n)}</div><div class="meta">${meta.join("")}</div></button>
+          ${locked ? `<span class="sit locked" title="Out per injury report">Out</span>` : `<button class="sit ${on ? "on" : ""}" data-toggle="${p.id}" aria-pressed="${on}">${on ? "Undo" : "Sit out"}</button>`}
+        </div>`;
+      }).join("")}
+    </div>`;
+  }).join("");
+}
+
+// ── Render: player sheet ────────────────────────────────────────────────────
+function find(pid, pos) {
+  const s = DATA.slots.find(x => x.pos === pos && x.players.some(p => p.id === pid)) ?? DATA.slots.find(x => x.players.some(p => p.id === pid));
+  return { s, p: s.players.find(p => p.id === pid) };
+}
+function playerImpact(p, s) {
+  if (s.unit === "ST") return { text: "Special teams aren't part of the team rating.", v: null };
+  const k = unitCalc(s.unit);
+  const hit = [...k.reported, ...k.user].filter(x => x.p.id === p.id).reduce((a, x) => a + x.c, 0);
+  const unit = s.unit === "OFF" ? "Offense" : "Defense";
+  if (outF(p)) {
+    if (Math.abs(hit) >= 0.005) return { text: `${unit}: his part of the ${fmt1(k.F - k.healthy)} change`, v: hit };
+    const ahead = s.players.slice(0, s.players.indexOf(p)).find(x => !outF(x));
+    return { text: ahead ? `None. He's a backup and ${ahead.n} (${val(ahead)}) starts.` : "None.", v: 0 };
+  }
+  const isStarter = s.players.find(x => !outF(x))?.id === p.id;
+  if (!isStarter) return { text: "Backup. No effect unless the players ahead of him sit.", v: null };
+  const n = s.players.slice(s.players.indexOf(p) + 1).find(x => !outF(x));
+  const c = W[s.pos] * ((n ? val(n) : REPLACEMENT) - val(p)) / DATA.slots.filter(x => x.unit === s.unit && x.players[0][state.basis] != null).reduce((a, x) => a + W[x.pos], 0);
+  return { text: `If he sits: ${unit} ${fmt1(c)} (${n ? n.n + " " + val(n) : "replacement level"} steps in)`, v: null };
+}
+function weekStrip(p) {
+  const by = Object.fromEntries(p.off.map(r => [r.w, r]));
+  let html = "";
+  for (let w = 1; w <= 8; w++) {
+    if (w === 8) { html += `<div class="wk bye"><b>Bye</b>Wk 8</div>`; continue; }
+    const r = by[w];
+    const st = r?.s, pr = PRACTICE(r?.p);
+    const cls = st === "Out" ? "out" : st ? "q" : "";
+    html += `<div class="wk ${cls}" title="Week ${w}: ${st ?? (r ? "no game status" : "not listed")}${pr ? " · practice " + pr : ""}"><b>${st ? st[0] : r ? "·" : "–"}</b>${pr ? pr.replace("Limited", "LP").replace("Full", "FP") : "Wk " + w}</div>`;
+  }
+  return `<div class="weeks">${html}</div><span class="src">O = Out, Q = Questionable, · = practiced with no game status, – = not listed. Source: NFL injury report via nflverse.</span>`;
+}
+function renderSheet() {
+  const root = document.getElementById("sheet-root");
+  if (!state.open) { root.innerHTML = ""; return; }
+  const { s, p } = find(state.open.pid, state.open.pos);
+  const r = report(p), run = officialRun(p), locked = outR(p), on = state.userOut.has(p.id) && !locked;
+  const imp = playerImpact(p, s);
+  const next = s.players.slice(s.players.indexOf(p) + 1).find(x => !outF(x));
+  const calls = [];
+  if (r && !r.injury) calls.push(`<div class="callout"><b>Not an injury</b>Sleeper lists him as Out with the reason "Coach's Decision". HIVE shows him as inactive and leaves him out of injury counts.</div>`);
+  if (r && r.injury && run && run.since < LATEST_WEEK && ageDays(p.inj.updated) < 7)
+    calls.push(`<div class="callout info"><b>Not a new injury</b>Sleeper's latest change was ${fmtDate(p.inj.updated)}, but the official report has listed him every week since Week ${run.since}${run.outWeeks.length > 1 ? `, ruled out ${run.outWeeks.length} straight games` : ""}.</div>`);
+  const wk7 = p.off.find(x => x.w === LATEST_WEEK);
+  if (r && r.code === "Q" && wk7 && !wk7.s)
+    calls.push(`<div class="callout warn"><b>Sources differ</b>Sleeper lists him Questionable (${esc(p.inj.body)}, updated ${fmtDate(p.inj.updated)}). On the Week 7 official report he practiced in ${PRACTICE(wk7.p)?.toLowerCase() ?? "an unlisted way"} with no game status. The Week 9 report starts Wed Nov 4.</div>`);
+  else if (r && r.code === "Q" && !wk7)
+    calls.push(`<div class="callout warn"><b>Not on the official report yet</b>Sleeper lists him Questionable (updated ${fmtDate(p.inj.updated)}, after SF's Week 7 game). He wasn't on the Week 7 official report, and SF had a bye in Week 8. The Week 9 report starts Wed Nov 4 and should confirm it.</div>`);
+  if (stale(p))
+    calls.push(`<div class="callout warn"><b>May be out of date</b>No update in ${ageDays(p.inj.updated)} days. This looks like his Week 7 game status. SF had a bye in Week 8, so expect a new status when the Week 9 report starts Wed Nov 4.</div>`);
+  if (r && r.injury && (r.code === "IR" || r.code === "PUP") && !p.off.length)
+    calls.push(`<div class="callout"><b>Limited history</b>Players on ${r.code} don't appear on the weekly injury report, so there's no official timeline. Sleeper doesn't publish when the injury started.</div>`);
+
+  const missing = t => `<span class="missing">${t}</span>`;
+  const facts = r ? `
+    <div class="facts">
+      <div class="fact"><span class="k">Status</span><span class="v">${chipFor(p)}<span class="src">Sleeper</span></span></div>
+      <div class="fact"><span class="k">Injury</span><span class="v">${!r.injury ? missing("Not an injury") : p.inj.body === "Undisclosed" ? "Undisclosed by the team" : p.inj.body ? esc(p.inj.body) : missing("Body part not reported")}${p.inj.notes ? ` · ${esc(p.inj.notes)}` : ""}<span class="src">Sleeper</span></span></div>
+      <div class="fact"><span class="k">On official report</span><span class="v">${run ? `Since Week ${run.since}${run.outWeeks.length ? ` · ruled out Week${run.outWeeks.length > 1 ? "s " + run.outWeeks[0] + "–" + run.outWeeks.at(-1) : " " + run.outWeeks[0]}` : ""}` : wk7 ? `Week 7: ${PRACTICE(wk7.p)?.toLowerCase() ?? "listed"} practice, no game status` : p.off.length ? "Not on the Week 7 report" : missing("Not listed this season")}<span class="src">NFL injury report via nflverse · latest Week 7</span></span></div>
+      <div class="fact"><span class="k">Injury started</span><span class="v">${missing("Not provided by any source")}</span></div>
+      <div class="fact"><span class="k">Last status update</span><span class="v num">${p.inj.updated ? `${fmtDateTime(p.inj.updated)} · ${agoText(ageDays(p.inj.updated))}` : missing("No timestamp")}<span class="src">Sleeper record change. This isn't the injury date.</span></span></div>
+      <div class="fact"><span class="k">Checked by HIVE</span><span class="v num">Nov 2, 3:46 PM · 12 min ago</span></div>
+    </div>` : `
+    <div class="facts">
+      <div class="fact"><span class="k">Status</span><span class="v">Not on Sleeper's injury list<span class="src">Sleeper · checked 12 min ago</span></span></div>
+      <div class="fact"><span class="k">On official report</span><span class="v">${run ? `Since Week ${run.since}` : "Not on the Week 7 report"}<span class="src">NFL injury report via nflverse</span></span></div>
+    </div>`;
+
+  root.innerHTML = `<div class="overlay" data-close></div>
+  <aside class="sheet" role="dialog" aria-modal="true" aria-label="${esc(p.n)} details">
+    <div class="sh-top">
+      <div style="min-width:0">
+        <span class="teampill">San Francisco 49ers</span> <span class="muted" style="font-size:12px">${POS_NAME[s.pos] ?? s.pos} · depth ${s.players.indexOf(p) + 1}</span>
+        <h2>${esc(p.n)}</h2>
+        <div>${chipFor(p)} ${stale(p) ? '<span class="chip stale">may be out of date</span>' : ""}</div>
+      </div>
+      <button class="x" data-close aria-label="Close player details">✕</button>
+    </div>
+
+    <div class="sec">
+      <div class="sitbar">${locked
+        ? `<span>Out per injury report. Sit-out doesn't apply.</span>`
+        : on ? `<span><b>Your sit-out.</b> Simulated, not reported.</span><button class="sit on" data-toggle="${p.id}">Undo</button>`
+        : `<span>Playing in this view.</span><button class="sit" data-toggle="${p.id}">Sit out</button>`}</div>
+    </div>
+
+    <div class="sec">
+      <h3>Injury <span class="pin">7</span></h3>
+      ${calls.join("")}
+      ${facts}
+      ${p.off.length ? `<div><div class="muted" style="font-size:12px;margin-bottom:4px">Official report by week · practice status</div>${weekStrip(p)}</div>` : ""}
+    </div>
+
+    <div class="sec">
+      <h3>Effect on team rating</h3>
+      <div class="impact"><span>${esc(imp.text)}</span>${imp.v != null ? `<span class="val ${imp.v < 0 ? "neg" : imp.v > 0 ? "pos" : ""}" style="color:var(${imp.v < 0 ? "--bad" : imp.v > 0 ? "--good" : "--mfg"})">${imp.v === 0 ? "0.0" : fmt1(imp.v)}</span>` : ""}</div>
+      ${imp.v === 0 ? "" : `<div class="muted" style="font-size:12.5px">Next in line: ${next ? `<b>${esc(next.n)}</b> · ${val(next)}` : "no healthy backup listed"}</div>`}
+    </div>
+
+    <div class="sec">
+      <h3>Rating</h3>
+      <div class="ratings">${badge(p.m, true)}<span class="cap">${p.m == null ? "Not in EA's Madden 27 ratings list. No estimate shown." : "Madden 27 · Week 7 ratings (EA, fetched Oct 30)"}</span>
+      ${state.basis === "b" && p.b != null ? `${badge(p.b, true)}<span class="cap">Current team-rating input: Madden blended with a generated PFF-style value. Not real PFF.</span>` : ""}</div>
+    </div>
+  </aside>`;
+  root.querySelector(".x")?.focus();
+}
+
+function render() { renderUnits(); renderGrid(); renderSheet(); }
+
+// ── Events ──────────────────────────────────────────────────────────────────
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-toggle],[data-sit],[data-undo-unit],[data-pid],[data-close],[data-tab],[data-basis],[data-open],#notes-on,#notes-off,#try-sit,.why-btn");
+  if (!t) return;
+  if (t.dataset.toggle || t.dataset.sit) {
+    const id = t.dataset.toggle || t.dataset.sit;
+    state.userOut.has(id) ? state.userOut.delete(id) : state.userOut.add(id);
+    return render();
+  }
+  if (t.dataset.undoUnit) {
+    DATA.slots.filter(s => s.unit === t.dataset.undoUnit).flatMap(s => s.players).forEach(p => state.userOut.delete(p.id));
+    return render();
+  }
+  if (t.dataset.close !== undefined) { state.open = null; return renderSheet(); }
+  if (t.dataset.tab) {
+    state.tab = t.dataset.tab;
+    document.querySelectorAll("#tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === state.tab));
+    return renderGrid();
+  }
+  if (t.dataset.basis) {
+    state.basis = t.dataset.basis;
+    document.querySelectorAll("[data-basis]").forEach(b => b.setAttribute("aria-pressed", b.dataset.basis === state.basis));
+    return render();
+  }
+  if (t.dataset.open) {
+    const s = DATA.slots.find(x => x.unit !== "ST" && x.players.some(p => p.n === t.dataset.open));
+    const p = s.players.find(p => p.n === t.dataset.open);
+    state.open = { pid: p.id, pos: s.pos }; return renderSheet();
+  }
+  if (t.id === "notes-on" || t.id === "notes-off") {
+    document.body.classList.toggle("no-notes", t.id === "notes-off");
+    document.getElementById("notes-on").setAttribute("aria-pressed", t.id === "notes-on");
+    document.getElementById("notes-off").setAttribute("aria-pressed", t.id === "notes-off");
+    return;
+  }
+  if (t.id === "try-sit") {
+    const warner = DATA.slots.find(s => s.pos === "MLB").players[0];
+    state.userOut.add(warner.id); return render();
+  }
+  if (t.dataset.pid) { state.open = { pid: t.dataset.pid, pos: t.dataset.pos }; return renderSheet(); }
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && state.open) { state.open = null; renderSheet(); }
+  if ((e.key === "Enter" || e.key === " ") && e.target.matches(".row[data-pid]")) { e.preventDefault(); e.target.click(); }
+});
+render();
+</script>
+
+</html>
